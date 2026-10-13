@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Gestão - Licenciado</title>
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#00897b">
+    <link rel="apple-touch-icon" href="icon-192.png">
+    <!-- Importação do estilo CSS externo -->
+    <link rel="stylesheet" href="style.css">
+    <!-- Importação da biblioteca oficial do Supabase via CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+
+    <div class="watermark">© 2024 SISTEMA LICENCIADO - TODOS OS DIREITOS RESERVADOS</div>
+
+    <!-- Botão de menu hamburguer para dispositivos móveis -->
+    <button class="menu-toggle no-print" onclick="toggleSidebar()">☰ Menu</button>
+
+    <!-- Modal de Login -->
+    <div id="loginModal" class="modal">
+        <div class="modal-content">
+            <h2>🔐 SISTEMA PROTEGIDO</h2>
+            <p style="margin: 15px 0; color: #666;">© Copyright 2024 - Todos os direitos reservados<br>Uso não autorizado é crime (Lei 9.610/98)</p>
+            <input type="email" id="loginUser" placeholder="E-mail de acesso">
+            <input type="password" id="loginPass" placeholder="Senha">
+            <button onclick="fazerLogin()">🔓 ACESSAR SISTEMA</button>
+            <hr style="margin: 15px 0;">
+            <small style="color:#999;">Sistema licenciado em nuvem</small>
+        </div>
+    </div>
+
+    <!-- Barra Lateral (Sidebar) -->
+    <div class="sidebar" id="sidebar" style="display: none;">
+        <h2>📋 SISTEMA</h2>
+        <button onclick="abrirAba('produtos')">📦 Produtos</button>
+        <button onclick="abrirAba('clientes')">👥 Clientes</button>
+        <button onclick="abrirAba('estoque')">📊 Estoque</button>
+        <button onclick="abrirAba('vendas')">💰 Vendas</button>
+        <button onclick="abrirAba('historico')">📜 Histórico de Vendas</button>
+        <button onclick="abrirAba('relatorios')">📄 Relatórios</button>
+        <button onclick="abrirAba('orcamentos')">📋 Orçamentos</button>
+        <button onclick="abrirAba('backup')">💾 Backup</button>
+        <!-- Botão exclusivo para Administrador Mestre -->
+        <button onclick="abrirAba('admin')" id="btnAdmin" style="display:none; background:#d97706;">🛠️ Painel Admin</button>
+        <button onclick="logout()" style="background:#c53030;">🚪 Sair</button>
+    </div>
+
+    <!-- Conteúdo Principal -->
+    <div class="main" id="main" style="display: none;">
+        
+        <!-- PRODUTOS -->
+        <div id="produtos" class="aba">
+            <div class="card">
+                <h3>➕ Cadastro de Produtos</h3>
+                <input type="text" id="codigoBarras" placeholder="Código de Barras (opcional)">
+                <input type="text" id="nome" placeholder="Nome do Produto">
+                <input type="number" id="compra" placeholder="Preço Compra (R$)">
+                <input type="number" id="venda" placeholder="Preço Venda (R$)">
+                <input type="number" id="quantidade" placeholder="Quantidade em estoque">
+                <button onclick="salvarProduto()">💾 Salvar Produto</button>
+            </div>
+        </div>
+        
+        <!-- CLIENTES -->
+        <div id="clientes" class="aba">
+            <div class="card">
+                <h3>👤 Cadastro de Clientes</h3>
+                <input type="text" id="clienteNome" placeholder="Nome Completo">
+                <input type="text" id="clienteTelefone" placeholder="Telefone">
+                <input type="text" id="clienteCpf" placeholder="CPF/CNPJ">
+                <input type="text" id="clienteEndereco" placeholder="Endereço">
+                <button onclick="salvarCliente()">💾 Salvar Cliente</button>
+            </div>
+            <div class="card">
+                <h3>📋 Lista de Clientes</h3>
+                <div class="pesquisa-cliente-container" style="margin-bottom:15px;">
+                    <label>🔎 Pesquisar cliente (digite nome, CPF ou telefone):</label>
+                    <input type="text" id="pesquisaClienteLista" placeholder="Ex: João, 123.456..." autocomplete="off">
+                    <div id="resultadosAutocompleteClientesLista" class="resultados-autocomplete-clientes-lista"></div>
+                </div>
+                <div id="listaClientes"></div>
+            </div>
+        </div>
+        
+        <!-- ESTOQUE -->
+        <div id="estoque" class="aba">
+            <div class="card">
+                <h3>📦 Produtos em Estoque</h3>
+                <div class="pesquisa-estoque-dinamico">
+                    <label>🔎 Pesquisar produto (digite nome ou código):</label>
+                    <input type="text" id="inputPesquisaEstoqueDinamico" placeholder="Ex: Café, Arroz..." autocomplete="off">
+                    <div id="resultadosAutocompleteEstoque" class="resultados-autocomplete-estoque"></div>
+                </div>
+                <div class="table-responsive">
+                    <table id="tabelaEstoque">
+                        <thead><tr><th>Código</th><th>Produto</th><th>Compra</th><th>Venda</th><th>Qtd</th><th>Lucro Unit.</th><th>Ações</th></tr></thead>
+                        <tbody id="corpoEstoque"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        
+        <!-- VENDAS (PDV) -->
+        <div id="vendas" class="aba">
+            <div class="card">
+                <h3>🛒 PDV - Ponto de Venda</h3>
+                <div class="info-fiscal"><strong>📌 Nota Fiscal:</strong> Sistema para gestão interna.</div>
+                <button class="link-externo" onclick="window.open('https://www.nfe.fazenda.gov.br/portal/principal.aspx', '_blank')">🏛️ Acessar Portal da NF-e (SEFAZ)</button>
+                
+                <div style="margin-top:20px; background:#f3e5f5; padding:15px; border-radius:12px; border-left: 4px solid #9c27b0;">
+                    <h4 style="margin:0 0 10px 0;">📋 Capturar Orçamento</h4>
+                    <div class="pesquisa-orcamento-container" style="margin:0; padding:0; box-shadow:none; background:transparent;">
+                        <label>🔍 Buscar orçamento (por cliente):</label>
+                        <input type="text" id="inputPesquisaOrcamentoVenda" placeholder="Ex: João, Maria..." autocomplete="off">
+                        <div id="resultadosAutocompleteOrcamentoVenda" class="resultados-autocomplete-orcamento"></div>
+                    </div>
+                    <button class="capturar-orcamento-btn" onclick="capturarOrcamentoSelecionado()">📥 Capturar Orçamento</button>
+                    <button onclick="limparCarrinhoVenda()" style="background:#6c757d; margin-top:5px;">🗑️ Limpar Carrinho</button>
+                </div>
+                
+                <div style="margin-top:20px;">
+                    <h4>📋 Registro da Venda</h4>
+                    
+                    <div style="background:#e8f0fe; padding:15px; border-radius:12px; margin-bottom:15px;">
+                        <label>📷 Leitor de Código de Barras:</label>
+                        <input type="text" id="leitorCodigoBarras" class="codigo-barras-input" placeholder="Aponte o leitor para o código" autofocus>
+                    </div>
+                    
+                    <div class="pesquisa-cliente-container">
+                        <label>👤 Buscar Cliente (digite nome, CPF ou telefone):</label>
+                        <input type="text" id="inputPesquisaClienteVenda" placeholder="Ex: João, Maria ou CPF..." autocomplete="off">
+                        <div id="resultadosAutocompleteClientes" class="resultados-autocomplete-clientes"></div>
+                        <div id="clienteSelecionadoInfo" class="cliente-selecionado-info">
+                            <span>✅ Cliente selecionado: <span id="nomeClienteSelecionado"></span></span>
+                            <button class="btn-limpar-cliente" onclick="limparClienteSelecionado()">✖️ Trocar</button>
+                        </div>
+                    </div>
+                    
+                    <div class="pesquisa-venda-container">
+                        <label>🔎 Buscar Produto (digite nome ou código):</label>
+                        <input type="text" id="inputPesquisaProdutoVenda" placeholder="Ex: Café, Arroz..." autocomplete="off">
+                        <div id="resultadosAutocompleteVenda" class="resultados-autocomplete"></div>
+                    </div>
+                    
+                    <div id="carrinho"></div>
+                    
+                    <p class="total">💰 Subtotal: R$ <span id="totalVenda">0.00</span></p>
+                    <input type="number" id="ajusteValor" placeholder="Desconto (-) ou Acréscimo (+)" step="0.01">
+                    <button onclick="aplicarAjuste()">⚙️ Aplicar Ajuste</button>
+                    <p class="total">💵 Total com Ajuste: R$ <span id="totalComAjuste">0.00</span></p>
+                    
+                    <select id="pagamento" onchange="calcularTaxa()">
+                        <option value="dinheiro">Dinheiro</option>
+                        <option value="pix">Pix</option>
+                        <option value="debito">Cartão Débito</option>
+                        <option value="credito">Cartão Crédito</option>
+                    </select>
+                    
+                    <div id="taxaInfo" class="taxa-info" style="display: none;">
+                        <span>💳 Taxa da operação: </span>
+                        <span class="taxa-valor" id="taxaPercentual">0%</span>
+                        <span> = R$ </span>
+                        <span class="taxa-valor" id="taxaValor">0.00</span>
+                        <div style="font-size: 12px; color: #666; margin-top: 5px;">
+                            📌 Valor líquido a receber: <strong class="valor-liquido" id="valorLiquido">R$ 0.00</strong>
+                        </div>
+                    </div>
+                    
+                    <input type="number" id="valorPago" placeholder="Valor pago" oninput="calcularTroco()">
+                    <div class="troco" id="displayTroco">🔄 Troco: R$ 0.00</div>
+                    
+                    <div style="background:#fff3e0; padding:15px; border-radius:12px; margin:15px 0;">
+                        <label>📄 Número da Nota Fiscal:</label>
+                        <input type="text" id="numeroNotaFiscal" placeholder="Ex: 123456">
+                    </div>
+                    
+                    <button onclick="finalizarVenda()">✅ Finalizar Venda</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- HISTÓRICO -->
+        <div id="historico" class="aba">
+            <div class="card">
+                <h3>📜 Histórico de Vendas Realizadas</h3>
+                <div class="table-responsive">
+                    <table id="tabelaHistorico">
+                        <thead>
+                            <tr><th>Data</th><th>Cliente</th><th>Pagamento</th><th>Total Líquido</th><th>Lucro</th></tr>
+                        </thead>
+                        <tbody id="corpoHistorico"></tbody>
+                    </table>
+                </div>
+                <div class="total">💰 Receita Total do Período: R$ <span id="totalPeriodo">0.00</span></div>
+            </div>
+        </div>
+
+        <!-- RELATÓRIOS -->
+        <div id="relatorios" class="aba">
+            <div class="dashboard">
+                <div class="card"><h3>📅 Total de vendas</h3><div class="valor"><span id="quantidadeVendas">0</span></div></div>
+                <div class="card"><h3>📦 Produtos cadastrados</h3><div class="valor"><span id="totalProdutos">0</span></div></div>
+            </div>
+        </div>
+
+        <!-- ORÇAMENTOS -->
+        <div id="orcamentos" class="aba">
+            <div class="card">
+                <h3>📋 Orçamentos Salvos</h3>
+                <div id="listaOrcamentos"><p>Nenhum orçamento salvo.</p></div>
+            </div>
+        </div>
+        
+        <!-- BACKUP -->
+        <div id="backup" class="aba">
+            <div class="card">
+                <h3>💾 Backup e Restauração</h3>
+                <button onclick="backup()">⬇️ Fazer Backup</button>
+            </div>
+        </div>
+
+        <!-- PAINEL ADMINISTRATIVO (SUPER ADMIN) -->
+        <div id="admin" class="aba">
+            <div class="card">
+                <h3>🛠️ Gestão de Comércios (Super Admin)</h3>
+                <p style="margin-bottom: 15px; color: #666;">Cadastre novos lojistas e gerencie os acessos ao sistema.</p>
+                <input type="email" id="novoAdminEmail" placeholder="E-mail do novo comércio">
+                <input type="password" id="novoAdminPass" placeholder="Senha inicial">
+                <input type="text" id="novoAdminLoja" placeholder="Nome do Comércio (Ex: Mania de Limpeza)">
+                <button onclick="cadastrarNovoComercio()" style="background:#d97706;">➕ Criar Acesso para Lojista</button>
+            </div>
+            <div class="card">
+                <h3>📋 Lojas e Comércios Cadastrados</h3>
+                <div class="table-responsive">
+                    <table>
+                        <thead><tr><th>Loja / Comércio</th><th>E-mail de Acesso</th><th>Ações</th></tr></thead>
+                        <tbody id="corpoListaLojas"><tr><td colspan="3">Carregando lojas...</td></tr></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modais Auxiliares -->
+    <div id="vendaDetalheModal" class="modal" style="display: none;">
+        <div class="modal-content modal-detalhes">
+            <h3>📋 Detalhes da Venda</h3>
+            <div id="detalhesVenda"></div>
+            <button onclick="fecharDetalheModal()" style="background:#666; margin-top:15px;">Fechar</button>
+        </div>
+    </div>
+
+    <!-- Importação do script JS externo -->
+    <script src="script.js"></script>
+</body>
+</html>

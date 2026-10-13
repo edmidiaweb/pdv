@@ -1,0 +1,71 @@
+* { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Arial, sans-serif; }
+body { display: flex; background: #f4f7fc; height: 100vh; overflow: hidden; }
+
+.sidebar { width: 260px; background: #0f2b3d; color: white; padding: 20px; display: flex; flex-direction: column; gap: 12px; box-shadow: 2px 0 12px rgba(0,0,0,0.1); z-index: 100; overflow-y: auto; flex-shrink: 0; transition: transform 0.3s ease; }
+.sidebar h2 { text-align: center; margin-bottom: 25px; font-weight: 600; letter-spacing: 1px; border-bottom: 1px solid #2c4e6e; padding-bottom: 12px; }
+.sidebar button { background: #1e3a4d; border: none; padding: 14px; color: white; border-radius: 10px; cursor: pointer; text-align: left; font-size: 16px; font-weight: 500; transition: all 0.2s; display: flex; align-items: center; gap: 12px; width: 100%; }
+.sidebar button:hover { background: #00897b; transform: translateX(6px); }
+
+.menu-toggle { display: none; position: fixed; top: 12px; left: 12px; z-index: 101; background: #0f2b3d; color: white; border: none; padding: 10px 14px; border-radius: 8px; font-size: 20px; cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,0.2); }
+
+.main { flex: 1; padding: 24px; overflow-y: auto; background: #f0f2f5; width: 100%; min-width: 0; }
+.aba { display: none; }
+.ativa { display: block; }
+
+.card { background: white; padding: 20px; border-radius: 20px; margin-bottom: 24px; box-shadow: 0 8px 20px rgba(0,0,0,0.05); overflow-x: auto; }
+h3 { margin-bottom: 18px; color: #0f2b3d; font-weight: 600; border-left: 5px solid #00897b; padding-left: 14px; }
+h4 { margin: 15px 0 10px 0; color: #1e3a4d; }
+
+input, select, button { width: 100%; padding: 12px 14px; margin-top: 12px; border-radius: 12px; border: 1px solid #cfdfe9; font-size: 15px; background: white; }
+button { background: #00897b; color: white; border: none; font-weight: bold; cursor: pointer; transition: 0.2s; }
+button:hover { background: #00695c; transform: scale(0.98); }
+
+table { width: 100%; border-collapse: collapse; margin-top: 16px; background: white; border-radius: 16px; overflow: hidden; min-width: 600px; }
+table th, table td { padding: 12px 10px; border-bottom: 1px solid #e2e8f0; text-align: left; vertical-align: top; }
+table th { background: #eef2f7; color: #1f3a4b; }
+.table-responsive { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+
+.total { font-size: 24px; font-weight: bold; color: #1e6f5c; margin-top: 16px; }
+.troco { font-size: 20px; font-weight: bold; color: #0d47a1; margin-top: 12px; }
+
+.excluir { background: #e53e3e; }
+.excluir:hover { background: #c53030; }
+.editar { background: #f59e0b; }
+.editar:hover { background: #d97706; }
+.visualizar { background: #2196f3; }
+.visualizar:hover { background: #1976d2; }
+
+.dashboard { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; }
+.dashboard .card { text-align: center; background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%); }
+.dashboard .valor { font-size: 28px; font-weight: 800; color: #00897b; margin-top: 10px; }
+
+.cliente-item { background: #f9fbfd; border-radius: 16px; padding: 14px; margin-bottom: 14px; border: 1px solid #dee4ec; }
+.carrinho-item { background: #fef9e6; padding: 10px; border-radius: 12px; margin: 8px 0; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; }
+.info-fiscal { background: #e8f0fe; border-left: 4px solid #00897b; padding: 15px; border-radius: 12px; margin-bottom: 15px; }
+.codigo-barras-input { background: #e8f0fe; border: 2px solid #00897b; font-family: monospace; font-size: 18px; letter-spacing: 2px; }
+
+.alerta { position: fixed; top: 20px; right: 20px; background: #4caf50; color: white; padding: 12px 20px; border-radius: 8px; z-index: 9999; max-width: 90%; }
+.alerta-erro { background: #f44336; }
+
+.modal { display: flex; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 10000; justify-content: center; align-items: center; padding: 15px; }
+.modal-content { background: white; padding: 30px; border-radius: 20px; width: 400px; max-width: 100%; text-align: center; max-height: 90vh; overflow-y: auto; }
+.watermark { position: fixed; bottom: 5px; right: 5px; font-size: 8px; color: rgba(0,0,0,0.1); pointer-events: none; z-index: 9999; }
+
+.pesquisa-cliente-container, .pesquisa-venda-container, .pesquisa-estoque-dinamico, .pesquisa-orcamento-container { background: white; border-radius: 16px; padding: 15px; margin-bottom: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+.pesquisa-cliente-container label, .pesquisa-venda-container label, .pesquisa-estoque-dinamico label { font-weight: 600; color: #1f3a4b; display: block; margin-bottom: 8px; }
+#inputPesquisaClienteVenda, #inputPesquisaProdutoVenda, #inputPesquisaEstoqueDinamico { width: 100%; padding: 14px; font-size: 16px; border: 2px solid #cfdfe9; border-radius: 14px; }
+
+.resultados-autocomplete-clientes, .resultados-autocomplete, .resultados-autocomplete-estoque, .resultados-autocomplete-orcamento { background: white; border-radius: 14px; margin-top: 10px; max-height: 280px; overflow-y: auto; border: 1px solid #e2e8f0; display: none; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+.resultado-item-cliente, .resultado-item, .resultado-item-estoque { padding: 12px 16px; border-bottom: 1px solid #eef2f7; display: flex; justify-content: space-between; align-items: center; cursor: pointer; }
+.resultado-item-cliente:hover, .resultado-item:hover { background: #f1f9ff; }
+
+.cliente-selecionado-info { background: #e8f0fe; border-radius: 12px; padding: 10px 15px; margin-top: 12px; display: none; align-items: center; justify-content: space-between; font-size: 14px; }
+.btn-limpar-cliente { background: #6c757d; padding: 6px 12px; width: auto; margin: 0; }
+
+@media(max-width: 900px) {
+    body { flex-direction: column; overflow: auto; height: auto; }
+    .menu-toggle { display: block; }
+    .sidebar { position: fixed; top: 0; left: -280px; height: 100vh; width: 260px; transition: left 0.3s ease; box-shadow: 4px 0 15px rgba(0,0,0,0.3); }
+    .sidebar.ativo { left: 0; }
+    .main { padding: 16px; padding-top: 70px; height: auto; overflow-y: visible; }
+}
